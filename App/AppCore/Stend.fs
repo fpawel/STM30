@@ -1,10 +1,6 @@
 ﻿module Stend
 
 open System
-open System.Collections.Generic
-open System.ComponentModel
-open System.ComponentModel.DataAnnotations
-
 open Comport.Protocol
     
 [<AutoOpen>]

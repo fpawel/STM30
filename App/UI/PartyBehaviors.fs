@@ -9,7 +9,6 @@ open STM30.Behaviors.Thread2
 
 type private P = ViewModels.Party.Product
 
-let private party = ViewModels.Party.party
 let products() = ViewModels.Party.party.Products |> Seq.toList
 let checkedProducts() = 
     products()

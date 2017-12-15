@@ -64,23 +64,23 @@ type ReleError =
     static member isValid x = ( x.ValidValue = x.Value )
     static member isError x = ( x.ValidValue <> x.Value )
     
+module private Helpers2 =
+    let main b var gas value = 
+        let pgs = Batch.ptGasConc gas b
+        let limit = (Batch.productType b).ErrorLimit 
+        ValueError.createNew var value pgs limit
 
-let main' b var gas value = 
-    let pgs = Batch.ptGasConc gas b
-    let limit = (Batch.productType b).ErrorLimit 
-    ValueError.createNew var value pgs limit
+    let adjust b value = 
+        let t = Batch.productType b   
+        let pgs = Batch.pgsConc Gas3 b
+        let limit = t.ErrorLimit * t.AdjustErrorLimit
+        ValueError.createNew Conc value pgs limit 
 
-let adjust' b value = 
-    let t = Batch.productType b   
-    let pgs = Batch.pgsConc Gas3 b
-    let limit = t.ErrorLimit * t.AdjustErrorLimit
-    ValueError.createNew Conc value pgs limit 
-
-let rele' gas state = 
-    Rele.values 
-    |> List.map( fun rele -> 
-        rele, {  ValidValue = Rele.validState ( PtGas.gas gas) rele; Value = Set.contains rele state}  )
-    |> Map.ofList
+    let rele gas state = 
+        Rele.values 
+        |> List.map( fun rele -> 
+            rele, {  ValidValue = Rele.validState ( PtGas.gas gas) rele; Value = Set.contains rele state}  )
+        |> Map.ofList
 
 let main b p = 
     listOf{
@@ -89,7 +89,7 @@ let main b p =
         match Product.getMain var gas p with
         | None -> ()
         | Some value -> 
-            return (var,gas), main' b var gas value } 
+            return (var,gas), Helpers2.main b var gas value } 
     |> Map.ofList
     |> fun m -> (fun var gas -> Map.tryFind (var,gas) m)
 
@@ -97,19 +97,18 @@ let adjust b p =
     let t = Batch.productType b   
     match p.Adjust with
     | None -> None
-    | Some value -> Some <| adjust' b value 
+    | Some value -> Some <| Helpers2.adjust b value 
 
 let variation b p =
     match p.Main.TryFind (Conc,PtGas2), p.Main.TryFind (Conc,PtGas4) with
     | Some c2, Some c4 -> 
-        let pgs = Batch.pgsConc Gas3 b
         let limit = (Batch.productType b).ErrorLimit * 0.5m
         Some ( ValueError.createNew Conc (c2 - c4) 0m limit )
     | _ -> None 
 
 let rele p = 
     p.ReleMain 
-    |> Map.map rele'
+    |> Map.map Helpers2.rele
     |> fun m ->
         fun gas ->
             match m.TryFind gas with

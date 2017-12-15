@@ -46,7 +46,6 @@ let modal'message'bar =
                        Placement = Center, ButtonAccept = Some "Продолжить", ButtonCancel = None )
 
 module Delay = 
-    open STM30.Behaviors.Thread2
     open STM30.Behaviors.Work
     [<AutoOpen>]
     module private P = 
@@ -77,7 +76,7 @@ module Delay =
         button'skip.Click.Add <| fun _ ->
             STM30.Behaviors.Work.Delay.cancel()
 
-        Delay.on'start.Value <- fun what get'time -> safe p <| fun () ->
+        Delay.onStart.Value <- fun what get'time -> safe p <| fun () ->
             text <- what
             progressBar.Value <- 0                
             performing'bar.DoUpdate <| fun () ->
@@ -86,11 +85,11 @@ module Delay =
 
             upd DateTime.Now get'time
 
-        Delay.on'stop.Value <- fun () -> safe p <| fun () ->
+        Delay.onStop.Value <- fun () -> safe p <| fun () ->
             performing'bar.DoUpdate <| fun () ->                    
                 performing'bar.BottomControl <- None
 
-        Delay.on'update.Value <- upd
+        Delay.onUpdate.Value <- upd
         fun () -> ()
     
     
@@ -105,7 +104,7 @@ let initialize =
                 modal'message'bar.Visible <- false
         | _ -> ()
 
-    STM30.Behaviors.Work.ModalMessage.on'show.Value <- fun title level text ->            
+    STM30.Behaviors.Work.ModalMessage.onShow.Value <- fun title level text ->            
         let t = modal'message'bar
         safe form <| fun () -> 
             t.Visible <- false
@@ -114,11 +113,11 @@ let initialize =
             t.Text <- text 
             t.Visible <- true
 
-    STM30.Behaviors.Work.ModalMessage.on'close.Value <- fun () ->            
+    STM30.Behaviors.Work.ModalMessage.onClose.Value <- fun () ->            
         safe form <| fun () -> 
             modal'message'bar.Visible <- false
 
-    STM30.Behaviors.Work.ModalMessage.get'is'vivisble.Value <- fun () ->
+    STM30.Behaviors.Work.ModalMessage.getIsVivisble.Value <- fun () ->
         modal'message'bar.Visible
 
     show'performing'message.Value <- fun level text ->            

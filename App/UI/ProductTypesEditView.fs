@@ -53,7 +53,7 @@ let private create() =
         "Porog1", "Порог 1"
         "Porog2", "Порог 2"
         "ErrorLimit", "Макс.погр."
-        "AdjustErrorLimit", "Погр.калибр." ]
+        "AdjustErrorLimit", "К-т погр. калибр." ]
     |> List.iter( fun (pth,hdr) -> 
         (   new DataGridViewTextBoxColumn ( DataPropertyName = pth, HeaderText = hdr ) )
         |> g.Columns.Add 

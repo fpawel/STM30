@@ -286,7 +286,7 @@ let hardwareTools =
                 let dialog,validate  = 
                     popupDialog 
                         { Dlg.def() with 
-                            Text = Some "Пожалуйста, введите адрес MODBUS от 1 до 127" 
+                            Text = Some "Введите адрес MODBUS от 1 до 127" 
                             ButtonAcceptText = "Установить адрес" 
                             Title = "Установка адреса MODBUS"
                             Width = 300
@@ -296,7 +296,7 @@ let hardwareTools =
                             if b  && v > 0uy && v<128uy then Some v else None)
                         ( fun value ->  
                             popup.Hide()
-                            sprintf "Установка адреса %A" value -->> fun () -> maybeErr{
+                            sprintf "Установка адреса %d" value -->> fun () -> maybeErr{
                                 do! Mdbs.testPort()
                                 do! Mdbs16.write 0uy Mdbs16.SetAddy ( decimal value )
                                 return!  Mdbs.read3decimal (byte value) 0 |> Result.someErr } ) 

@@ -240,5 +240,8 @@ let zip2 xs ys =
         | xh::xt,yh::yt -> loop ((xh,yh)::r) xt yt
     loop [] xs ys |> List.rev
 
-
+module Seq =
+    let toStr<'T> delimString conv (collection : 'T seq )  = 
+        collection |> Seq.fold( fun acc x ->
+            acc + (if acc |> String.IsNullOrEmpty then acc else delimString) + (conv x) ) ""
     
