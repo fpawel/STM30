@@ -15,7 +15,7 @@ type Product(batch, product, notifyChanged) as this =
     
     let alchemy'main() = Alchemy.main batch product
     let alchemy'adjust() = Alchemy.adjust batch product
-    let alchemy'variation() = Alchemy.variation batch product
+    let alchemy'variation() = Alchemy.variation product
     let alchemy'rele() = Alchemy.rele product
 
     let reader = Reader (fun () -> product.Addy)

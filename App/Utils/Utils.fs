@@ -222,7 +222,7 @@ let datePath root =
     let (~%%) = sprintf "%d"
 
     let year year = 
-        Path.Combine(exepath, root, %% year )
+        Path.Combine(root, %% year )
 
     let month y month = 
         

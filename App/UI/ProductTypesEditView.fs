@@ -50,12 +50,9 @@ let private create() =
 
     [   "Name", "Исполнение"
         "NormativeDoc", "ИБЯЛ"
-        "Porog1", "Порог 1"
-        "Porog2", "Порог 2"
-        "ErrorLimit", "Макс.погр."
-        "AdjustErrorLimit", "К-т погр. калибр." ]
+         ]
     |> List.iter( fun (pth,hdr) -> 
-        (   new DataGridViewTextBoxColumn ( DataPropertyName = pth, HeaderText = hdr ) )
+        (   new DataGridViewTextBoxColumn ( DataPropertyName = pth, HeaderText = hdr, Width = 300 ) )
         |> g.Columns.Add 
         |> ignore ) 
 

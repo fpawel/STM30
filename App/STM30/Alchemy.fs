@@ -71,13 +71,13 @@ type ReleError =
 module private Helpers2 =
     let main b var gas value = 
         let pgs = Batch.ptGasConc gas b
-        let limit = (Batch.productType b).ErrorLimit 
+        let limit = 5m 
         ValueError.createNew var value pgs limit
 
     let adjust b value = 
         let t = Batch.productType b   
         let pgs = Batch.pgsConc Gas3 b
-        let limit = t.ErrorLimit * t.AdjustErrorLimit
+        let limit = 5m * 0.2m
         ValueError.createNew Conc value pgs limit 
 
     let rele gas state = 
@@ -103,10 +103,10 @@ let adjust b p =
     | None -> None
     | Some value -> Some <| Helpers2.adjust b value 
 
-let variation b p =
+let variation p =
     match p.Main.TryFind (Conc,PtGas2), p.Main.TryFind (Conc,PtGas4) with
     | Some c2, Some c4 -> 
-        let limit = (Batch.productType b).ErrorLimit * 0.5m
+        let limit = 5m * 0.5m
         Some ( ValueError.createNew Conc (c2 - c4) 0m limit )
     | _ -> None 
 

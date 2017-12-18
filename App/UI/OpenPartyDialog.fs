@@ -75,7 +75,7 @@ module private Helpers =
                                             DisplayMember = "What", FlatStyle = FlatStyle.Flat)        
             x.Items.Add "" |> ignore
             for a in ProductTypes.values do
-                x.Items.Add a |> ignore
+                x.Items.Add a.Name |> ignore
             x            
         let _ = new Panel( Parent = p, Height = 3, Dock = DockStyle.Top )         
 

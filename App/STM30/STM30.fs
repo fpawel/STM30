@@ -295,23 +295,28 @@ type Product =
 type ProductType =
     {   mutable Name : string
         mutable NormativeDoc : string
-        mutable Porog1 : decimal
-        mutable Porog2 : decimal
-        mutable ErrorLimit : decimal 
-        mutable AdjustErrorLimit : decimal }
+        //mutable Porog1 : decimal
+        //mutable Porog2 : decimal
+        //mutable ErrorLimit : decimal 
+        //mutable AdjustErrorLimit : decimal 
+        }
     static member createNew() = 
         {   Name = "СТМ-30-"
             NormativeDoc = "413216.050-11"
-            Porog1 = 7m
-            Porog2 = 12m
-            ErrorLimit = 5m 
-            AdjustErrorLimit = 0.2m}
+            //Porog1 = 7m
+            //Porog2 = 12m
+            //ErrorLimit = 5m 
+            //AdjustErrorLimit = 0.2m
+            }
 
 module ProductTypes =     
     open System.ComponentModel
     let values, save =  
         let filename = "productTypes.json"
-        let values = Logging.JsonConfig.read filename <| fun () -> [ ProductType.createNew() ] 
+        let values = Logging.JsonConfig.read filename <| fun () -> 
+            [   {   Name = "СТМ-30М-10ДЦ"; NormativeDoc = "413216.050-11-10" }
+                {   Name = "СТМ-30М-10ДБ"; NormativeDoc = "413216.050-11-11" } 
+            ] 
         let values = ResizeArray<ProductType>(values)
         let values = new BindingList<ProductType>( values ) 
         let save() = Logging.JsonConfig.write filename [ for x in values -> x ]

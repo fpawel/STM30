@@ -186,8 +186,8 @@ let main =
             
             yield SetPorogs <!> fun p ->  maybeErr{
                 let t = party.GetProductType()
-                do! writeProduct Mdbs16.POR_1 t.Porog1 p
-                do! writeProduct Mdbs16.POR_2 t.Porog2 p 
+                do! writeProduct Mdbs16.POR_1 7m p
+                do! writeProduct Mdbs16.POR_2 12m p 
                 do! resetReles()}
             
             yield TestMode <!> fun p -> maybeErr{

@@ -52,7 +52,7 @@ module private Helpers =
                 yield && Alchemy.main b x var pt 
             if var=Conc then
                 yield && Alchemy.adjust b x
-                yield && Alchemy.variation b x ]
+                yield && Alchemy.variation x ]
         |> tr 
 
     let releblock x = Rele.values |> List.map ( fun rele -> 

@@ -2,19 +2,16 @@
 
 open System
 open System.IO
-open System.Collections.ObjectModel
 
 open Nessos.FsPickler
 
 module Path = 
-    let rootFolder = "ProductionData"
-
     let root = 
-        let x = Path.Combine(appDir, rootFolder)
+        let x = Path.Combine(appDir, "ProductionData")
         createDirectory x
         x
 
-    let batch, year, month, day = datePath rootFolder
+    let batch, year, month, day = datePath root
 
 [<AutoOpen>]
  module private Helpers = 
@@ -45,7 +42,6 @@ module Path =
 
         let batch'' canCreate (id:string) (dt:DateTime)  = 
             let (~%%) = string
-            let month = dt.ToString("MMM", System.Globalization.CultureInfo.InvariantCulture)
             let path = Path.Combine(Path.batch false dt, id )
             if canCreate then
                 createDirectory path
