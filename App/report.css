@@ -74,3 +74,12 @@ th, td {
     color:maroon;
     background-color: aliceblue;
 }
+
+.rel-error {
+    font-style:italic;
+    font-size:smaller;
+}
+
+.abs-error {
+    font-weight: bolder;
+}

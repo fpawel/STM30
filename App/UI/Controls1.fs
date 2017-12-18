@@ -3,12 +3,10 @@
 open System
 open System.Windows.Forms
 open System.Drawing
-open System.Runtime.InteropServices
 
 open MyWinForms.Utils
 
 open MainWindow
-open MyWinForms.TopDialog
 
 [<AutoOpen>]
 module private Helpers1 =
@@ -52,6 +50,20 @@ module TopBar =
 
     let thread1ButtonsBar = new Panel(Parent = placeHolder, Dock = DockStyle.Left, AutoSize = true)
 
+    let buttonAbout = 
+        let x =
+            new Button( Parent = right, Height = 40, Width = 40, Visible = true,
+                        ImageList = Widgets.Icons.instance.imageList1,
+                        FlatStyle = FlatStyle.Flat,
+                        Dock = DockStyle.Right, ImageKey = "about")
+        right.Controls.Add <| new Panel(Dock = DockStyle.Right, Width = 3)
+
+        x.Click.Add <| fun _ ->
+            MainWindow.aboutForm.Show()  
+            |> ignore  
+
+        x
+
     let buttonTools = 
             new Button( Parent = right, Height = 40, Width = 40, Visible = true,
                         ImageList = Widgets.Icons.instance.imageList1,
@@ -84,9 +96,9 @@ module TopBar =
             new Button( Parent = right, Height = 40, Width = 40, Visible = true,
                         ImageList = Widgets.Icons.instance.imageList1,
                         Dock = DockStyle.Right, ImageKey = "tools1")
-        setTooltip buttonStendSettings "Параметры \"железа\""
+        setTooltip buttonStendSettings "Параметры оборудования"
         buttonStendSettings.Click.Add <| fun _ ->            
-            let popup = MyWinForms.Utils.popupConfig "Параметры \"железа\"" AppConfig.config PropertySort.Alphabetical
+            let popup = MyWinForms.Utils.popupConfig "Параметры оборудования" AppConfig.config PropertySort.Alphabetical
             popup.Font <- form.Font
             popup.Show(buttonStendSettings)
         
@@ -101,19 +113,12 @@ module TopBar =
             popup.Show(buttonSettings)
         fun () -> ()
 
-let TextBlockOperationLogging =    
-    let x =  
-        new WebBrowser(Parent = scenaryLayer, BackColor = productsLayer.BackColor, 
-                       Dock = DockStyle.Fill, AllowNavigation = false, Url = null,
-                       IsWebBrowserContextMenuEnabled = false, AllowWebBrowserDrop = false )
-    x.DocumentCompleted.Add <| fun _ ->
-        x.AllowNavigation <- false
-        if  x.Document <> null && x.Document.Body <> null then 
-            x.Document.Body.ScrollIntoView(false)
-    x
 
+let loggingJournal = 
+    new RichTextBox(Parent = scenaryLayer, BackColor = productsLayer.BackColor, 
+                        Dock = DockStyle.Fill, ReadOnly = true)
 let GridScenary = 
-    let splt = new Splitter(Parent = scenaryLayer, Dock = DockStyle.Left, Width = 3, BackColor = Color.LightGray)
+    let _ = new Splitter(Parent = scenaryLayer, Dock = DockStyle.Left, Width = 3, BackColor = Color.LightGray)
     let x = 
         new DataGridView( Parent = scenaryLayer, AutoGenerateColumns = false, 
                             Name = "ScenaryGridView", 
@@ -127,6 +132,29 @@ let GridScenary =
 
     x
 
+
+module LoggingRichText = 
+    let private appendText (r:RichTextBox) (text,color) = 
+        r.SelectionStart <- r.TextLength
+        r.SelectionLength <- 0
+        r.SelectionColor <- color
+        r.AppendText text
+        r.SelectionColor <- r.ForeColor
+
+    let private appendLine r (dt:DateTime, level, text) = 
+        appendText r (sprintf "%A " dt, Color.DarkGreen)
+        appendText r (text + "\n", Logging.foreColor level  )
+
+    
+    let setLogging (r:RichTextBox) logging  = 
+        r.Text <- ""
+        List.iter (appendLine r) logging
+    
+
+    let addRecord r level text = 
+        appendLine r (DateTime.Now, level, text  )
+        r.ScrollToCaret()
+
 module private SelectedOperation = 
 
     let get() = 
@@ -137,9 +165,9 @@ module private SelectedOperation =
 
     let showLoggigng() = 
         match get() with
-        | None -> TextBlockOperationLogging.DocumentText <- ""
+        | None -> loggingJournal.Text <- ""
         | Some x -> 
-            STM30.View.LoggingHtml.set TextBlockOperationLogging x.Operation.FullName x.Logging
+            LoggingRichText.setLogging loggingJournal x.Logging
 
 
 
@@ -165,16 +193,17 @@ let private initialize1 =
         | Some op  -> 
             let xs = STM30.ViewModels.Operations.Operation.tree op.Operation
             if xs |> List.exists( fun o -> o.FullName = operation) then
-                safe TextBlockOperationLogging <| fun () -> 
-                    STM30.View.LoggingHtml.addRecord TextBlockOperationLogging level text
+                safe loggingJournal <| fun () -> 
+                    LoggingRichText.addRecord loggingJournal level text
+                    
         | _ -> ()
 
     STM30.Behaviors.Thread2.PerfomOperationEvent.Add <| function
         | operation,true ->
             match SelectedOperation.get() with            
             | Some op when op.Operation.FullName = operation.FullName -> 
-                safe TextBlockOperationLogging <| fun () ->
-                    STM30.View.LoggingHtml.set TextBlockOperationLogging operation.FullName []
+                safe loggingJournal <| fun () ->
+                    LoggingRichText.setLogging loggingJournal []
             | _ -> ()
         | _ -> ()
 

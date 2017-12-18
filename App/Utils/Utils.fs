@@ -14,6 +14,18 @@ open Microsoft.FSharp.Reflection
 let rec exnRoot (exn:System.Exception) = 
     if exn.InnerException=null then exn else exnRoot exn.InnerException
 
+
+let appDir = 
+    let appDataDir = 
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+    let exeName =
+        Path.GetFileNameWithoutExtension(AppDomain.CurrentDomain.FriendlyName) 
+    let dir = Path.Combine(appDataDir, exeName)
+    if not <| Directory.Exists dir then
+        let x = Directory.CreateDirectory dir
+        assert x.Exists
+    dir
+
 let exepath = 
     
     try

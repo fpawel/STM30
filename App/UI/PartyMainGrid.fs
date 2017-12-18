@@ -16,25 +16,14 @@ open STM30.View.Controls1
 [<AutoOpen>]
 module private Helpers =
 
-    type Operation = STM30.ViewModels.Operations.Operation
-
     type P = STM30.ViewModels.Party.Product 
-    type VE = STM30.Alchemy.ValueError
-
     type Column = DataGridViewColumn
-    type CheckBoxColumn = MyWinForms.GridViewCheckBoxColumn
     type TextColumn = DataGridViewTextBoxColumn
     type RelesColumn = MyWinForms.DataGridViewRelesColumn
-
-    let safe = MyWinForms.Utils.safe
-
-    type CelStyle = DataGridViewCellStyle
 
     let party = STM30.ViewModels.Party.party
     
     let (<==) cols col = grid'view'add'col cols col
-
-    let (~%%) x = x :> Column
 
     let prodCellFormatting (p:P) (cell:DataGridViewCell) prod =
         let g = cell.DataGridView
@@ -118,8 +107,6 @@ let initialize =
         |> List.tryFind( snd >> fst >> (==) col )
         |> Option.map( fst )
 
-    let (|ReaderVar|_|) (p:P) var = p.Reader.Var.TryFind var 
-    
     g.CellFormatting.Add <| fun e ->
         let row = g.Rows.[e.RowIndex]
         let col = g.Columns.[e.ColumnIndex]        

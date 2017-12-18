@@ -1,16 +1,20 @@
 ﻿module STM30.Alchemy  
 
-open System
-open System.ComponentModel
 
 type Color = System.Drawing.Color
 open MyWinForms.Color
+
+let decToStr (specifier:string) (value:decimal) = value.ToString(specifier)
 
 type ValueError = 
     {   Value : decimal 
         VarType : VarType
         Nominal : decimal
         Limit  : decimal }
+
+    
+
+        
 
     member x.ValueNominal =
         VarType.concToValue x.VarType x.Nominal

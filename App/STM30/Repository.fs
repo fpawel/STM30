@@ -10,7 +10,7 @@ module Path =
     let rootFolder = "ProductionData"
 
     let root = 
-        let x = Path.Combine(exepath, rootFolder)
+        let x = Path.Combine(appDir, rootFolder)
         createDirectory x
         x
 
@@ -205,8 +205,18 @@ module Batch =
 
 let private pair x y = x,y
 
-let getTreeByDate() = 
-    get'list()    
+
+let getParties prodType serial =
+    get'list() 
+    |> List.filter( fun p ->
+        match prodType with 
+        | Some prodType -> p.ProductType = prodType
+        | _ -> true  )
+    |> List.filter( fun p ->
+        match serial with 
+        | Some serial -> 
+            List.exists ( (=) serial)  p.Serials
+        | _ -> true  )
     |> Seq.groupBy( fun x -> x.Date.Year )
     |> Seq.sortBy fst
     |> Seq.map( fun ( year, xs) -> 
@@ -219,4 +229,4 @@ let getTreeByDate() =
             |> Seq.sortBy fst
             |> Seq.map( fun ( day, xs) -> pair day xs )
             |> pair month )
-        |> pair year )
+        |> pair year ) 

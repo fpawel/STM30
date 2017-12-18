@@ -5,6 +5,18 @@ open System.Windows.Forms
 open System.Drawing
 
 
+let aboutForm = 
+    let x = new Widgets.AboutForm() 
+    x.LabelVersion.Text <-  
+        try
+            Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString()
+        with _ -> 
+            ""
+    x.Deactivate.Add(fun _ -> 
+        x.Hide()
+        )
+    x
+
 let form = 
     
     let x = new Form(Font = new Font("Consolas", 12.f), WindowState = FormWindowState.Maximized )
@@ -51,9 +63,10 @@ do
                     {   ColWidths = [for c in g.Columns -> c.Width]
                         ColumnHeaderHeight = g.ColumnHeadersHeight } )     
             |> Map.ofSeq
-        
 
-    let rec h = EventHandler( fun _ _ -> 
+    let mutable h : EventHandler = null
+        
+    h <- EventHandler( fun _ _ -> 
         form.Activated.RemoveHandler h
         
         for g in get'grids() do 
@@ -73,6 +86,15 @@ do
                         | _ -> 
                             let sz = TextRenderer.MeasureText( c.HeaderText, c.HeaderCell.Style.Font )
                             sz.Width + 10 )
-                    |> max 50 ))
+                    |> max 50 )
+        aboutForm.Hide()
+
+        aboutForm.FormBorderStyle <- FormBorderStyle.FixedDialog
+        aboutForm.ControlBox <- false
+        aboutForm.ShowInTaskbar <- false
+        aboutForm.ShowIcon <- true )
 
     form.Activated.AddHandler h
+
+    aboutForm.Show()
+    aboutForm.Refresh()

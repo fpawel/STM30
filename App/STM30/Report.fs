@@ -17,7 +17,9 @@ module private Helpers =
     let pt'gas = class' "pt-gas-name" 
     let param'name = class' "param-name" 
     
-    let decToStr (specifier:string) (value:decimal) = value.ToString(specifier)
+    let decToStr (specifier:string) (value:decimal) = 
+        Text.RegularExpressions.Regex.Replace(value.ToString(specifier), ",", ".")
+        
     let decOptToStr specifier value = 
         match value with
         | None -> ""
@@ -26,7 +28,15 @@ module private Helpers =
     let value'error specifier = function
         | None -> td [%% "&nbsp;"]
         | Some (v : Alchemy.ValueError) ->
-            td[ %% decToStr specifier v.Conc
+            //абсолютная погрешность
+            let absErr = decToStr specifier (v.Value - v.ValueNominal)
+            // погрешность в процентах от максимально допустимой
+            let relErr = decToStr "0.#" (100M * (v.Conc - v.Nominal) / v.Limit) + "%"
+
+            td[ 
+                div [ %% absErr; class' "abs-error" ]
+                div [ %% relErr; class' "rel-error" ]
+
                 class' ( if v.IsError then "invalid-error-value" else "valid-error-value" ) ]
 
     let var'title = function
@@ -58,7 +68,9 @@ module private Helpers =
         |> tr )
 
     let testsblock x = 
-        ProductionPoint.values |> List.map ( fun p -> 
+        ProductionPoint.values 
+        |> Seq.skip 2
+        |> Seq.map ( fun p -> 
         let (~&&) x = %% DateTime.format "dd.MM.yy HH:mm" x
         tr[
             yield td [%% p.What]
@@ -74,6 +86,7 @@ module private Helpers =
                  yield  td [&& dt ]
                  yield  td [%% text ]
                  yield  class' "successful-test-row" ] )
+        |> Seq.toList
 
 
 let product b (x:Product) = 

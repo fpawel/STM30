@@ -56,6 +56,7 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Utils\Utils.fs" />
     <Compile Include="Utils\Ref.fs" />
     <Compile Include="Utils\Tree.fs" />
@@ -98,6 +99,7 @@
     <Compile Include="UI\PartyVarGrids.fs" />
     <Compile Include="UI\ReportView.fs" />
     <Compile Include="UI\ProductTypesEditView.fs" />
+    <Compile Include="UI\OpenPartyDialog.fs" />
     <Compile Include="UI\Menus1.fs" />
     <Compile Include="Programm.fs" />
     <None Include="untune.fsx" />

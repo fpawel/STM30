@@ -56,62 +56,13 @@ type PartyInfo =
         [<DisplayName("ПГС2")>]    
         [<Description("Концентрация ПГС2, середина шкалы")>]
         mutable PGS2  : decimal
-        [<DisplayName("ПГС2")>]    
+        [<DisplayName("ПГС3")>]    
         [<Description("Концентрация ПГС3, конец шкалы")>]
         mutable PGS3  : decimal 
 
         [<DisplayName("Количество приборов")>]    
         [<Description("Количество приборов в партии")>]
         mutable Count  : byte  }
-
-module Parties = 
-        
-    type Node = 
-        | Year of int 
-        | Month of int * int
-        | Day of int * int * int
-        | Batch of STM30.Info.Batch
-
-    let private setPartyNodeStyle(node:TreeNode) = 
-        node.ForeColor <- Color.Blue
-        node.BackColor <- Color.LightGray
-        //node.NodeFont <- new Font( "Segue UI", 12.f, FontStyle.Bold )
-    
-    let createControl() = 
-        let nodes = ResizeArray<Node * TreeNode>()
-        let mutable selectedNode : TreeNode = null            
-        let xs = 
-            STM30.Repository.getTreeByDate() |> Seq.map( fun (year,xs) -> 
-                let xyear = TreeNode(sprintf "%d" year  )
-                nodes.Add(Year year, xyear)
-
-                xs |> Seq.iter( fun (month,xs) -> 
-                    let xmonth = TreeNode(monthByNumber month  )
-                    nodes.Add(Month (year,month), xmonth)
-                    xyear.Nodes.Add xmonth |> ignore
-                    xs |> Seq.iter( fun (day,xs) ->                         
-                        let xday = TreeNode(sprintf "%d" day  )
-                        nodes.Add(Day (year,month,day), xday)
-                        xmonth.Nodes.Add xday |> ignore
-                        xs |> Seq.iter( fun b -> 
-                            let serials = listToStr ", " (sprintf "%d") b.Serials
-                            let node = TreeNode(sprintf "%s, %A, %s" b.ProductType b.Name serials)
-                            if b.Id = party.Id then
-                                selectedNode <- node
-                                setPartyNodeStyle node
-                                setPartyNodeStyle xday
-                                setPartyNodeStyle xmonth
-                                setPartyNodeStyle xyear
-                            nodes.Add(Batch b, node)
-                            xday.Nodes.Add node |> ignore ) ) ) 
-                xyear )
-            |> Seq.toArray
-        let c= new TreeView(CheckBoxes = false, Font = new Font( "Segue UI", 12.f ))
-        c.SelectedNode <- selectedNode    
-        c.Nodes.AddRange xs
-        c.ExpandAll()
-        c.SelectedNode <- selectedNode      
-        c, nodes
 
 let addProducts (b:Button) = 
     let tb = new TextBox(Width = 200, Dock = DockStyle.Left, Text = "1")
@@ -205,39 +156,6 @@ let createNewParty (b:Button) =
             e.Cancel <- true
     popup1.Show(b)
 
-let openParty (button : Button) = 
-    let c, nodes = Parties.createControl()
-    c.Height <- 600
-    let nodes1 = nodes |> Seq.map( fun (x,y) -> y.GetHashCode(),x) |> Map.ofSeq
-    let getBatch() = 
-        let x = c.SelectedNode
-        if x=null then None else
-        match nodes1.[x.GetHashCode()] with
-        | Parties.Batch x -> Some x
-        | _ -> None
-
-    let dialog,validate  = 
-        popupDialog
-            { Dlg.def() with 
-                Dlg.ButtonAcceptText = "Открыть" 
-                Width = 450
-                Dlg.Content = c 
-                Dlg.Title = "Открыть партию"}
-            getBatch
-            ( fun b ->
-                match STM30.Repository.Batch.open'by'id b.Id with
-                | Ok b -> 
-                    party.SetBatch b
-                    MyWinForms.Utils.updateGridDataSourceBinding Controls1.GridScenary
-                | Err error -> 
-                    MessageBox.Show(sprintf "Не удалось открыть данные партии %A, %A. %s" b.Date b.ProductType error, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error )
-                    |> ignore )
-    c.AfterSelect.Add <| fun _ -> validate()
-    
-    dialog.Show(button)
-    c.Select()
-    c.Focus() |> ignore
-
 let toolsMenu() =
     let rec clearLoggigng(b:Button) = 
         let d,_ = 
@@ -263,6 +181,9 @@ let toolsMenu() =
             yield "Редактировать таблицу исполнений", fun _ ->
                 popup.Close()
                 STM30.View.ProductTypesEdit.show()
+            yield "Перейти в каталог приложения", fun _ ->
+                Diagnostics.Process.Start(appDir) 
+                |> ignore
             
             ]
         |> simpleMenu
@@ -529,7 +450,7 @@ let initialize =
     
     imgbtn "additem" "Добавить в партию новые приборы" addProducts
 
-    imgbtn "open" "Открыть ранее сохранённую партию" (fun b -> openParty b )
+    imgbtn "open" "Открыть ранее сохранённую партию" (fun b -> OpenPartyDialog.showDialog b )
 
     imgbtn "add" "Создать новую партию" createNewParty
 
