@@ -38,7 +38,7 @@ module Path =
     module Path = 
         
         let baddata = lazy (                
-            let x = Path.Combine( exepath, "__CORRUPTED__" ) 
+            let x = Path.Combine( appDir, "__CORRUPTED__" ) 
             if Directory.Exists x |> not then 
                 Directory.CreateDirectory x |> ignore
             x )
