@@ -4,7 +4,6 @@ open System
 open STM30
 open STM30.Behaviors.Thread2
 open STM30.Behaviors.PartyBehavior
-open System.ComponentModel
 open STM30.ViewModels.Operations
 
 module Delay = 
@@ -185,7 +184,6 @@ let main =
                     | d -> Some <| sprintf "%s не соотв. %s" (bytesToStr d) (bytesToStr softVersion)  }            
             
             yield SetPorogs <!> fun p ->  maybeErr{
-                let t = party.GetProductType()
                 do! writeProduct Mdbs16.POR_1 7m p
                 do! writeProduct Mdbs16.POR_2 12m p 
                 do! resetReles()}
@@ -212,21 +210,23 @@ let main =
             yield adjust ScaleNull
             yield adjust ScaleEnd
 
-            yield "Проверка реле ОТКАЗ" <|> fun () -> maybeErr{
-                
-                %% ("Проверка включения реле ОТКАЗ","Отключите датчики")
-                do! sleep 5000
-                do! Stend.testPort()
-                doProductionWork TestFailureOn <| fun p -> maybeErr{
-                    let! r = p.Reader.ReadReleState Failure 
-                    if not r then return "не включилось" }
+            yield "Проверка реле ОТКАЗ" <|> fun () -> 
+                maybeErr{                
+                    %% ("Проверка включения реле ОТКАЗ","Отключите датчики")
+                    do! sleep 5000
+                    do! Stend.testPort()
+                    doProductionWork TestFailureOn <| fun p -> maybeErr{
+                        let! r = p.Reader.ReadReleState Failure 
+                        if not r then return "не включилось" }
 
-                %% ("Проверка выключения реле ОТКАЗ","Подключите датчики" )
-                do! sleep 60000
-                do! Stend.testPort()
-                doProductionWork TestFailureOff <| fun p -> maybeErr{
-                    let! r = p.Reader.ReadReleState Failure 
-                    if r then return "не выключилось" } } 
+                    %% ("Проверка выключения реле ОТКАЗ","Подключите датчики" )
+                    do! sleep 60000
+                    do! Stend.testPort()
+                    doProductionWork TestFailureOff <| fun p -> maybeErr{
+                        let! r = p.Reader.ReadReleState Failure 
+                        if r then return "не выключилось" 
+                    } 
+                } 
 
             yield "Проверка осн. погр." <||> [   
                 for pt in PtGas.values do

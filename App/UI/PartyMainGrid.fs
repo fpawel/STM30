@@ -3,15 +3,14 @@
 open System
 open System.Windows.Forms
 open System.Drawing
-open System.Collections.Generic
 
-open FSharp.Reflection
 
 open MyWinForms.Utils
 
 open STM30
  
 open STM30.View.Controls1
+open STM30.Behaviors
 
 [<AutoOpen>]
 module private Helpers =
@@ -155,5 +154,12 @@ let initialize =
             | None -> setNoValue ()
 
         | _ -> e.FormattingApplied <- false
+
+
+    PartyBehavior.onInterrogateProduct.Value <- fun n -> 
+        g.SelectedRows.Clear()
+        for i = 0 to g.Rows.Count - 1 do    
+            if i = n then 
+                g.Rows.[i].Selected <- true
             
     fun () -> ()

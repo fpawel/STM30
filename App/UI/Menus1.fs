@@ -92,7 +92,7 @@ let addProducts (b:Button) =
     let dialog,validate  =             
         popupDialog
             { Dlg.def() with 
-                Dlg.Text = Some "Пожалуйста, введите количество добавляемых в партию приборов от 1 до 20" 
+                Dlg.Text = Some "Введите количество добавляемых в партию приборов от 1 до 20" 
                 Dlg.ButtonAcceptText = "Добавить" 
                 Dlg.Title = "Добавить приборы"
                 Width = 300
@@ -116,7 +116,7 @@ let deleteProducts (b:Button) =
                 Dlg.Text = 
                     getSelectedProducts() 
                     |> listToStr ", " (fun x -> sprintf "#%d №%d" x.Addy x.Serial)
-                    |> sprintf "Пожалуйста, подтвердите необходимость удаления приборов %s" 
+                    |> sprintf "Подтвердите необходимость удаления приборов %s" 
                     |> Some
                 Dlg.ButtonAcceptText = "Удалить" 
                 Dlg.Title = "Удалить приборы" }
@@ -161,7 +161,7 @@ let toolsMenu() =
         let d,_ = 
             popupDialog
                 { Dlg.def() with 
-                    Dlg.Text = Some  "Пожалуйста, подтвердите необходимость очистки журнала выполнения сценария." 
+                    Dlg.Text = Some  "Подтвердите необходимость очистки журнала выполнения сценария." 
                     Dlg.ButtonAcceptText = "Очистить" 
                     Dlg.Title = "Очистка журнала"
                     Width = 300 }
@@ -263,7 +263,6 @@ let hardwareTools =
     popup    
 
 let pneumo = 
-
     let rec ( -->> ) s f =
         s <|> f        
         |> fun x ->
@@ -309,8 +308,6 @@ let pneumo =
                 d.Show b ]
         |> MyWinForms.Utils.buttonsMenu (new Font("Consolas", 12.f)) ( Some 300 )
     popup
-
-// installing_updates
 
 open STM30.View.Controls1.TopBar
 open STM30.Behaviors
@@ -364,7 +361,7 @@ let initialize =
     
     let buttonRun = new Button( Parent = Controls1.TopBar.thread1ButtonsBar, Dock = DockStyle.Left, AutoSize = true,
                                 ImageKey = "run",
-                                Text = (sprintf "%A" STM30.Behaviors.Thread2.scenary.Value.FullName),
+                                Text = "Выполнить",
                                 ImageAlign = ContentAlignment.MiddleLeft,
                                 TextImageRelation = TextImageRelation.ImageBeforeText,
                                 TextAlign = ContentAlignment.MiddleCenter,
@@ -373,7 +370,6 @@ let initialize =
     buttonRun.Click.Add <| fun _ ->  
         STM30.Behaviors.Thread2.run true STM30.Behaviors.Thread2.scenary.Value
     STM30.Behaviors.Thread2.scenary.AddChanged <| fun (_,x) ->
-        buttonRun.Text <- sprintf "%A" x.FullName
         Controls1.setTooltip buttonRun ("Выполнить " + buttonRun.Text)
         buttonRun.AutoSize <- false
         buttonRun.AutoSize <- true
@@ -387,12 +383,17 @@ let initialize =
         let s1 = "Опрос","Опрос выбранных параметров приборов партии - концентрация, ток, напряжение, состояние контактов реле, режим"    
         s1 <== fun _ ->
             Work.runInterrogate()
-    ("Адрес", "Отправить широковещательную комманду MODBUS установки адреса") <== fun x ->        
-        let tb = new TextBox(Width = 290, Text = (party.GetNewValidAddy() |> string) )                    
+    ("Адрес", "Отправить широковещательную комманду MODBUS установки адреса") <== fun x ->    
+        
+        let newAddr = 
+            let xs = STM30.View.Controls1.ProductsGrids.main.SelectedCells
+            if xs.Count = 0 then party.GetNewValidAddy() else party.Products.[xs.[0].RowIndex].Addy
+
+        let tb = new TextBox(Width = 290, Text = string newAddr )                    
         let dialog,validate  = 
             popupDialog 
                 { Dlg.def() with 
-                    Text = Some "Пожалуйста, введите адрес MODBUS от 1 до 127" 
+                    Text = Some "Ведите адрес MODBUS от 1 до 127" 
                     ButtonAcceptText = "Установить адрес" 
                     Title = "Установка адреса MODBUS"
                     Width = 300

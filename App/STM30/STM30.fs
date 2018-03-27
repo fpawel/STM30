@@ -35,7 +35,7 @@ type Rele =
     static member info  = function
         | Porog1 ->  "ПОРОГ1", "П1", Color.DarkGreen, (false, true, true)
         | Porog2 ->  "ПОРОГ2", "П2", Color.BlueViolet, (false, true, true)
-        | Failure -> "АВАРИЯ", "Ав", Color.DarkRed, (false, false, false)
+        | Failure -> "АВАРИЯ", "Ав", Color.Green, (false, false, false)
         | Mode ->    "РЕЖИМ", "Ре", Color.Brown, (false,  false, false)
         | Status ->  "СТАТУС", "Ст", Color.DarkSlateBlue, (true, true, true)
 

@@ -28,7 +28,7 @@ let text'scenary'name =
     x
 
 let closing'bar = 
-    TopmostBar( form, Visible = false, Width = 400, Font = new Font("Consolas", 12.f),
+    TopmostBar( form, Visible = false, Width = 300, Font = new Font("Consolas", 12.f),
                 TextForeColor = Some Color.Brown, Placement = RightBottom,
                 ButtonAccept = None, ButtonCancel = None,
                 Text = "Выполнение прервано! Выполняется подготовка данных...") 
@@ -38,8 +38,8 @@ let buttonStop =
                ImageList = Widgets.Icons.instance.imageList1,
                Dock = DockStyle.Left, ImageKey = "close")
 
-let performing'bar = TopmostBar(form, Visible = false, MinTextHeight = 100, Width = 400, 
-                                Font = new Font("Consolas", 12.f))
+let performing'bar = TopmostBar(form, Visible = false, MinTextHeight = 0, Width = 300, 
+                                Font = new Font("Consolas", 10.f))
 
 let modal'message'bar = 
             TopmostBar(form, Visible = false, Width = 400, Font = new Font("Consolas", 12.f),

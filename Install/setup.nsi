@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "СТМ-30-Цех-1"
-!define PRODUCT_VERSION "0.0.0.0"
+!define PRODUCT_VERSION "1.1.6659.217870"
 !define PRODUCT_PUBLISHER "Филимоненков"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"

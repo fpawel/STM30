@@ -22,6 +22,8 @@ let doWithProducts f =
         if isKeepRunning() && p.IsChecked then 
             f p ) 
 
+let onInterrogateProduct = Ref.Initializable<_>(sprintf "onInterrogateProduct %s:%s" __LINE__ __SOURCE_FILE__ )
+
 let interrogate() = maybeErr {
     let v = AppConfig.config.Var
 
@@ -33,7 +35,13 @@ let interrogate() = maybeErr {
     if is'stend then
         do! Stend.testPort()
     doWithProducts <| fun p ->
-        p.Reader.Interrogate() |> ignore }
+
+        checkedProducts() |> List.iteri ( fun i p ->       
+            if isKeepRunning() && p.IsChecked then 
+                onInterrogateProduct.Value i
+                p.Reader.Interrogate() |> ignore
+                onInterrogateProduct.Value (-1) )
+         }
 
 let writeProduct cmd arg (p:ViewModels.Party.Product)  = 
     Mdbs16.write p.Addy cmd arg 
